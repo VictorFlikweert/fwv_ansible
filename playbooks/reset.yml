@@ -1,0 +1,42 @@
+---
+- name: Uninstall all instances of k3s/rancher on all the hosts
+  hosts: all
+  tasks:
+    - name: Check if k3s is installed
+      stat:
+        path: /usr/local/bin/k3s-killall.sh
+      register: k3s_exists
+
+    - name: Check if k3s-server is installed
+      stat:
+        path: /usr/local/bin/k3s-uninstall.sh
+      register: k3s_server_exists
+
+    - name: Check if k3s-agent is installed
+      stat:
+        path: /usr/local/bin/k3s-agent-uninstall.sh
+      register: k3s_agent_exists
+
+    - name: Kill all
+      shell: |
+        /usr/local/bin/k3s-killall.sh
+      when: k3s_exists.stat.exists
+
+    - name: Uninstall Agent
+      shell: |
+        /usr/local/bin/k3s-agent-uninstall.sh
+      when: k3s_agent_exists.stat.exists
+
+    - name: Uninstall Server
+      shell: |
+        /usr/local/bin/k3s-uninstall.sh
+      when: k3s_server_exists.stat.exists
+
+    - name: Check if Rancher is installed
+      stat:
+        path: /usr/local/bin/rancher-system-agent-uninstall.sh
+      register: rancher_exists
+
+    - name: Uninstall rancher
+      shell: /usr/local/bin/rancher-system-agent-uninstall.sh
+      when: rancher_exists.stat.exists

@@ -1,0 +1,2 @@
+- import_playbook: register_cluster.yml
+- import_playbook: register_agents.yml
