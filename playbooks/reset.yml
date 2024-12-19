@@ -1,4 +1,3 @@
----
 - name: Uninstall all instances of k3s/rancher on all the hosts
   hosts: all
   tasks:
