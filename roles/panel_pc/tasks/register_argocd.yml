@@ -1,0 +1,44 @@
+- name: Fetch k3s configuration file from the default remote machine to the local controller
+  fetch:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: /tmp/k3s.yaml
+    flat: yes
+  become: true  # Ensures permissions to access the file on the source machine
+
+- name: Copy the fetched k3s file from local to the destination host
+  copy:
+    src: /tmp/k3s.yaml
+    dest: "/tmp/k3s.yaml"
+  delegate_to: "172.16.10.106"
+  become: true  # Ensures permissions to access the file on the source host
+  vars:
+    ansible_user: fwv
+    ansible_sudo_pass: "{{ main_cluster_pass }}"
+
+- name: Replace 127.0.0.1 in the file on the destination host
+  replace:
+    path: "/tmp/k3s.yaml"
+    regexp: "127\\.0\\.0\\.1"
+    replace: "{{ hostvars[groups['master'][0]]['ansible_host'] }}"
+  delegate_to: "172.16.10.106"
+  become: true  # Ensures permissions to access the file on the source host
+  vars:
+    ansible_user: fwv
+    ansible_sudo_pass: "{{ main_cluster_pass }}"
+
+- name: Move the modified file to the clusters directory on the destination host
+  command: mv /tmp/k3s.yaml /srv/clusters/{{ hostvars['pp1']['cluster_name'] }}.yaml
+  delegate_to: "172.16.10.106"
+  become: true  # Ensures permissions to access the file on the source host
+  vars:
+    ansible_user: fwv
+    ansible_sudo_pass: "{{ main_cluster_pass }}"
+
+- name: Run the ArgoCD cluster add command on the destination host
+  ansible.builtin.shell: |
+    sudo argocd cluster add default --name {{ hostvars['pp1']['cluster_name'] }} --kubeconfig /srv/clusters/{{ hostvars['pp1']['cluster_name'] }}.yaml
+  delegate_to: "172.16.10.106"
+  become: true  # Ensures permissions to access the file on the source host
+  vars:
+    ansible_user: fwv
+    ansible_sudo_pass: "{{ main_cluster_pass }}"

@@ -3,6 +3,8 @@
     src: cluster_settings.json.j2
     dest: /tmp/cluster_settings.json
     mode: '0755'
+  vars:
+    cluster_name: "{{ hostvars['pp1']['cluster_name'] }}"
 
 - name: Read cluster_settings file
   slurp:
@@ -115,4 +117,7 @@
 
 - name: Wait for 3 minutes to ensure components are ready
   wait_for:
-    timeout: 180
+    timeout: 10
+
+- name: Label the node as a panel-pc node
+  shell: sudo k3s kubectl label nodes $(hostname) --overwrite machine-type=PanelPC
