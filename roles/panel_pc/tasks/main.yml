@@ -72,10 +72,6 @@
     msg: "No valid insecure node command found"
   when: insecure_node_command == ''
 
-- name: Display final URL with flags
-  debug:
-    msg: "{{ insecure_node_command }} --etcd --controlplane --worker"
-
 - name: Set command to register
   set_fact:
     registration_command: "{{ insecure_node_command }} --etcd --controlplane --worker"
@@ -92,6 +88,14 @@
     dest: /tmp/k3s_install_command.sh
     mode: '0755'
 
+- name: Display final connection URL contents
+  command: cat /tmp/k3s_install_command.sh
+  register: command_output
+
+- name: Print to console
+  debug:
+    msg: "{{command_output.stdout}}"
+
 - name: Run the k3s install script
   shell: /tmp/k3s_install_command.sh
 
@@ -102,7 +106,7 @@
 
 - name: Wait for Rancher to write necessary files
   pause:
-    seconds: 30
+    seconds: 45
 
 - name: Fetch current cattle-cluster-agent deployment YAML
   command: >
@@ -115,7 +119,7 @@
 - name: Set dockerhub registration token
   shell: sudo k3s kubectl create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username=larsflikweert --docker-password={{ dockerhub_token }} --docker-email=lars@flikweertvision.nl
 
-- name: Wait for 3 minutes to ensure components are ready
+- name: Wait for 10 seconds to ensure components are ready
   wait_for:
     timeout: 10
 
