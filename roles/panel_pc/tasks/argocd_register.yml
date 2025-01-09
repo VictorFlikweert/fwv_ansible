@@ -9,7 +9,7 @@
   copy:
     src: /tmp/k3s.yaml
     dest: "/tmp/k3s.yaml"
-  delegate_to: "172.16.10.106"
+  delegate_to: "{{ main_cluster_ip }}"
   become: true  # Ensures permissions to access the file on the source host
   vars:
     ansible_user: fwv
@@ -20,15 +20,15 @@
     path: "/tmp/k3s.yaml"
     regexp: "127\\.0\\.0\\.1"
     replace: "{{ hostvars[groups['master'][0]]['ansible_host'] }}"
-  delegate_to: "172.16.10.106"
+  delegate_to: "{{ main_cluster_ip }}"
   become: true  # Ensures permissions to access the file on the source host
   vars:
     ansible_user: fwv
     ansible_sudo_pass: "{{ main_cluster_pass }}"
 
 - name: Move the modified file to the clusters directory on the destination host
-  command: mv /tmp/k3s.yaml /srv/clusters/{{ hostvars['pp1']['cluster_name'] }}.yaml
-  delegate_to: "172.16.10.106"
+  command: mv /tmp/k3s.yaml /srv/clusters/{{ cluster_name }}.yaml
+  delegate_to: "{{ main_cluster_ip }}"
   become: true  # Ensures permissions to access the file on the source host
   vars:
     ansible_user: fwv
@@ -36,8 +36,8 @@
 
 - name: Run the ArgoCD cluster add command on the destination host
   ansible.builtin.shell: |
-    sudo argocd cluster add default --name {{ hostvars['pp1']['cluster_name'] }} --kubeconfig /srv/clusters/{{ hostvars['pp1']['cluster_name'] }}.yaml
-  delegate_to: "172.16.10.106"
+    sudo argocd cluster add default --name {{ cluster_name }} --kubeconfig /srv/clusters/{{ cluster_name }}.yaml
+  delegate_to: "{{ main_cluster_ip }}"
   become: true  # Ensures permissions to access the file on the source host
   vars:
     ansible_user: fwv
@@ -45,8 +45,8 @@
 
 - name: Set default labels for argocd deployment
   ansible.builtin.shell: |
-    sudo argocd cluster set {{ hostvars['pp1']['cluster_name'] }} --label env={{ kube_env }} --label group={{ kube_group }}
-  delegate_to: "172.16.10.106"
+    sudo argocd cluster set {{ cluster_name }} --label env={{ kube_env }} --label group={{ kube_group }}
+  delegate_to: "{{ main_cluster_ip }}"
   become: true  # Ensures permissions to access the file on the source host
   vars:
     ansible_user: fwv

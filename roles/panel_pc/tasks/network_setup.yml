@@ -1,13 +1,13 @@
 - name: Test connectivity main cluster
   ansible.builtin.command:
-    cmd: ping -c 2 172.16.10.106
+    cmd: "ping -c 2 {{ main_cluster_ip }}"
   register: ping_result
   failed_when: ping_result.rc != 0
 
 - name: Editing the /etc/hosts file to make sure that we can reach the cluster through 'rancher.flikweertvision.nl'
   lineinfile:
     path: /etc/hosts
-    line: "172.16.10.106 rancher.flikweertvision.nl"
+    line: "{{ main_cluster_ip }} rancher.flikweertvision.nl"
     state: present
   become: true
 

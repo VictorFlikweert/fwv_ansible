@@ -14,4 +14,4 @@
   import_tasks: argocd_register.yml
 
 - name: Save the K3S token for the registration of subnodes
-  import_tasks: get_k3s_token.yml
+  import_tasks: k3s_get_token.yml

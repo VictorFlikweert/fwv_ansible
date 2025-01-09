@@ -1,1 +1,0 @@
-- parametrize the cluster ip (172.16.10.106)
