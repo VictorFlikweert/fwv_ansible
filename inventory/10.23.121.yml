@@ -15,7 +15,7 @@ all:
       vars:
         cluster_name: flikweertintern121
         cluster_version: v1.30.6+k3s1
-        kube_env: dev
+        kube_env: test
         kube_group: test-group
   vars:
     ansible_user: root

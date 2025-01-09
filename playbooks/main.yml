@@ -5,15 +5,6 @@
   roles:
     - panel_pc
 
-- name: Run tasks to get k3s token from the master node
-  hosts: master
-  gather_facts: false
-  tasks:
-    - name: Get k3s token
-      import_role:
-        name: panel_pc
-        tasks_from: get_k3s_token
-
 - name: Configure worker nodes with NVIDIA runtime and join cluster
   hosts: workers
   gather_facts: true

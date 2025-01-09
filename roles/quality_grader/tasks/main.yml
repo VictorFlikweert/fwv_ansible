@@ -53,4 +53,4 @@
 
 - name: Join worker node to k3s cluster
   shell: |
-    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ cluster_version }} K3S_URL=https://{{ hostvars[groups['master'][0]]['ansible_host'] }}:6443 K3S_TOKEN={{ hostvars[groups['master'][0]]['k3s_token'] }} sh -s - --docker --node-label machine-type=QG
+    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ cluster_version }} K3S_URL=https://{{ hostvars[groups['master'][0]]['ansible_host'] }}:6443 K3S_TOKEN={{ hostvars['pp1']['k3s_token'] }} sh -s - --docker --node-label machine-type=QG

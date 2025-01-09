@@ -1,0 +1,76 @@
+- name: Get cluster details
+  uri:
+    url: "{{ rancher_url }}/v3/clusters?name={{ cluster_name }}"
+    method: GET
+    headers:
+      Authorization: "{{ auth_token }}"
+      Content-Type: application/json
+    return_content: yes
+    validate_certs: false
+    status_code: 200
+  register: cluster_response
+
+- name: Extract cluster ID
+  set_fact:
+    cluster_id: "{{ cluster_response.json.data[0].id }}"
+  when: cluster_response.json.data | length > 0
+
+- name: Fail if cluster ID not found
+  fail:
+    msg: "No cluster found with name {{ cluster_name }}"
+  when: cluster_id is not defined
+
+- name: Print some stuff
+  debug: 
+    msg: "{{ cluster_id }}"
+  when: cluster_id is defined
+
+- name: Get cluster registration tokens
+  uri:
+    url: "{{ rancher_url }}/v3/clusterregistrationtokens?clusterId={{ cluster_id }}"
+    method: GET
+    headers:
+      Authorization: "{{ auth_token }}"
+    return_content: yes
+    validate_certs: false
+    status_code: 200
+  register: token_response
+
+- name: Extract insecure node command
+  set_fact:
+    insecure_node_command: "{{ token_response.json.data[0].insecureNodeCommand | default('', true) }}"
+
+- name: Fail if insecure node command not found
+  fail:
+    msg: "No valid insecure node command found"
+  when: insecure_node_command == ''
+
+- name: Set command to register
+  set_fact:
+    registration_command: "{{ insecure_node_command }} --etcd --controlplane --worker"
+
+- name: Render k3s install script to temporary file
+  template:
+    src: k3s_server_install.ssh.j2
+    dest: /tmp/k3s_install_command.sh
+    mode: '0755'
+
+- name: Display final connection URL contents
+  command: cat /tmp/k3s_install_command.sh
+  register: command_output
+
+- name: Print to console
+  debug:
+    msg: "{{command_output.stdout}}"
+
+- name: Run the k3s install script
+  shell: /tmp/k3s_install_command.sh
+
+- name: Ensure rancher-system-agent.service is restarted
+  systemd:
+    name: rancher-system-agent.service
+    state: restarted
+
+- name: Wait for Rancher to write necessary files
+  pause:
+    seconds: 45

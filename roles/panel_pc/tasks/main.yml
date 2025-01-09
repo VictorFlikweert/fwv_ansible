@@ -1,106 +1,17 @@
 - name: Configure the network to work with kubernetes
   import_tasks: network_setup.yml
 
-- name: Register the cluster with rancher
-  import_tasks: rancher_initialize.yml
+- name: Register the cluster with Rancher
+  import_tasks: rancher_register.yml
 
-- name: Get cluster details
-  uri:
-    url: "{{ rancher_url }}/v3/clusters?name={{ cluster_name }}"
-    method: GET
-    headers:
-      Authorization: "{{ auth_token }}"
-      Content-Type: application/json
-    return_content: yes
-    validate_certs: false
-    status_code: 200
-  register: cluster_response
+- name: Install K3S using the script provided by Rancher
+  import_tasks: rancher_k3s_install.yml
 
-- name: Extract cluster ID
-  set_fact:
-    cluster_id: "{{ cluster_response.json.data[0].id }}"
-  when: cluster_response.json.data | length > 0
+- name: K3S configuration (NVidia runtime, dockerhub registration)
+  import_tasks: k3s_configuration.yml
 
-- name: Fail if cluster ID not found
-  fail:
-    msg: "No cluster found with name {{ cluster_name }}"
-  when: cluster_id is not defined
+- name: Register the cluster with ArgoCD
+  import_tasks: argocd_register.yml
 
-- name: Print some stuff
-  debug: 
-    msg: "{{ cluster_id }}"
-  when: cluster_id is defined
-
-- name: Get cluster registration tokens
-  uri:
-    url: "{{ rancher_url }}/v3/clusterregistrationtokens?clusterId={{ cluster_id }}"
-    method: GET
-    headers:
-      Authorization: "{{ auth_token }}"
-    return_content: yes
-    validate_certs: false
-    status_code: 200
-  register: token_response
-
-- name: Extract insecure node command
-  set_fact:
-    insecure_node_command: "{{ token_response.json.data[0].insecureNodeCommand | default('', true) }}"
-
-- name: Fail if insecure node command not found
-  fail:
-    msg: "No valid insecure node command found"
-  when: insecure_node_command == ''
-
-- name: Set command to register
-  set_fact:
-    registration_command: "{{ insecure_node_command }} --etcd --controlplane --worker"
-
-- name: Set dynamic IP addresses
-  ansible.builtin.set_fact:
-    master_ip: "{{ ansible_default_ipv4.address }}"
-    internal_ip: "{{ ansible_default_ipv4.address }}"
-  when: ansible_default_ipv4 is defined
-
-- name: Render k3s install script to temporary file
-  template:
-    src: k3s_server_install.ssh.j2
-    dest: /tmp/k3s_install_command.sh
-    mode: '0755'
-
-- name: Display final connection URL contents
-  command: cat /tmp/k3s_install_command.sh
-  register: command_output
-
-- name: Print to console
-  debug:
-    msg: "{{command_output.stdout}}"
-
-- name: Run the k3s install script
-  shell: /tmp/k3s_install_command.sh
-
-- name: Ensure rancher-system-agent.service is restarted
-  systemd:
-    name: rancher-system-agent.service
-    state: restarted
-
-- name: Wait for Rancher to write necessary files
-  pause:
-    seconds: 45
-
-- name: Fetch current cattle-cluster-agent deployment YAML
-  command: >
-    sudo k3s kubectl patch deployment cattle-cluster-agent -n cattle-system -p '{"spec":{"template":{"spec":{"dnsPolicy": "ClusterFirstWithHostNet", "hostNetwork": true}}}}'
-  register: deployment_yaml
-
-- name: Set nvidia runtime support
-  shell: k3s kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.17.0/deployments/static/nvidia-device-plugin.yml
-
-- name: Set dockerhub registration token
-  shell: sudo k3s kubectl create secret docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username=larsflikweert --docker-password={{ dockerhub_token }} --docker-email=lars@flikweertvision.nl
-
-- name: Wait for 10 seconds to ensure components are ready
-  wait_for:
-    timeout: 10
-
-- name: Label the node as a panel-pc node
-  shell: sudo k3s kubectl label nodes $(hostname) --overwrite machine-type=PanelPC
+- name: Save the K3S token for the registration of subnodes
+  import_tasks: get_k3s_token.yml

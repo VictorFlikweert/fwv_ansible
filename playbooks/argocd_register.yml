@@ -1,8 +1,0 @@
-- name: Setup ArgoCD cluster registration
-  hosts: master
-  gather_facts: false
-  tasks:
-    - name: Register ArgoCD
-      import_role:
-        name: panel_pc
-        tasks_from: register_argocd
