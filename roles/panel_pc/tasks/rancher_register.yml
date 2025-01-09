@@ -1,13 +1,17 @@
-- name: Render cluster_settings
-  template:
-    src: cluster_settings.json.j2
-    dest: /tmp/cluster_settings.json
-    mode: '0755'
+# - name: Render cluster_settings
+#   template:
+#     src: cluster_settings.json.j2
+#     dest: /tmp/cluster_settings.json
+#     mode: '0755'
 
-- name: Read cluster_settings file
-  slurp:
-    src: /tmp/cluster_settings.json
-  register: cluster_settings_content
+# - name: Read cluster_settings file
+#   slurp:
+#     src: /tmp/cluster_settings.json
+#   register: cluster_settings_content
+
+- name: Prepare cluster_settings.json for registering with Rancher
+  set_fact:
+    cluster_settings_content: "{{ lookup('template', 'cluster_settings.json.j2') }}"
 
 - name: Register cluster
   uri:
@@ -16,7 +20,7 @@
     headers:
       Authorization: "{{ auth_token }}"
       Content-Type: "application/json"
-    body: "{{ cluster_settings_content.content | b64decode }}"
+    body: "{{ cluster_settings_content }}"
     body_format: json
     return_content: yes
     validate_certs: no

@@ -20,11 +20,6 @@
     msg: "No cluster found with name {{ cluster_name }}"
   when: cluster_id is not defined
 
-- name: Print some stuff
-  debug: 
-    msg: "{{ cluster_id }}"
-  when: cluster_id is defined
-
 - name: Get cluster registration tokens
   uri:
     url: "{{ rancher_url }}/v3/clusterregistrationtokens?clusterId={{ cluster_id }}"
@@ -39,6 +34,7 @@
 - name: Extract insecure node command
   set_fact:
     insecure_node_command: "{{ token_response.json.data[0].insecureNodeCommand | default('', true) }}"
+  when: token_response.json.data | length > 0
 
 - name: Fail if insecure node command not found
   fail:
@@ -49,22 +45,16 @@
   set_fact:
     registration_command: "{{ insecure_node_command }} --etcd --controlplane --worker"
 
-- name: Render k3s install script to temporary file
-  template:
-    src: k3s_server_install.ssh.j2
-    dest: /tmp/k3s_install_command.sh
-    mode: '0755'
+- name: Render and execute k3s install script
+  shell: "{{ lookup('template', 'k3s_server_install.ssh.j2') }}"
 
-- name: Display final connection URL contents
-  command: cat /tmp/k3s_install_command.sh
-  register: command_output
+# - name: Display final connection URL contents
+#   command: cat /tmp/k3s_install_command.sh
+#   register: command_output
 
-- name: Print to console
-  debug:
-    msg: "{{command_output.stdout}}"
-
-- name: Run the k3s install script
-  shell: /tmp/k3s_install_command.sh
+# - name: Print to console
+#   debug:
+#     msg: "{{command_output.stdout}}"
 
 - name: Ensure rancher-system-agent.service is restarted
   systemd:
