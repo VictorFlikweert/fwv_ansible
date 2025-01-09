@@ -21,8 +21,26 @@
     name: "nvidia-container-toolkit"
     state: present
 
-- name: configure docker engine
+- name: configure docker engine 1/2
   shell: sudo nvidia-ctk runtime configure --runtime=docker
+
+- name: configure docker engine 2/2
+  ansible.builtin.copy:
+    dest: /etc/docker/daemon.json
+    content: |
+      {
+          "default-runtime": "nvidia",
+          "runtimes": {
+              "nvidia": {
+                  "args": [],
+                  "path": "nvidia-container-runtime"
+              }
+          }
+      }
+    owner: root
+    group: root
+    mode: '0644'
+
 
 - name: Restart Docker engine
   systemd:

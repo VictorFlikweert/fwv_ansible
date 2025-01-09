@@ -1,3 +1,10 @@
+- name: Ensure a specific string exists in /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "172.16.10.106 rancher.flikweertvision.nl"
+    state: present
+  become: true
+
 - name: Render cluster_settings
   template:
     src: cluster_settings.json.j2
