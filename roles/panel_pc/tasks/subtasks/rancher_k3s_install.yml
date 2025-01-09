@@ -1,4 +1,4 @@
-- name: Get cluster details
+- name: Get cluster ID from Rancher
   uri:
     url: "{{ rancher_url }}/v3/clusters?name={{ cluster_name }}"
     method: GET
@@ -10,17 +10,17 @@
     status_code: 200
   register: cluster_response
 
-- name: Extract cluster ID
+- name: Extract cluster ID from Rancher response
   set_fact:
     cluster_id: "{{ cluster_response.json.data[0].id }}"
   when: cluster_response.json.data | length > 0
 
-- name: Fail if cluster ID not found
+- name: Check if cluster ID found
   fail:
     msg: "No cluster found with name {{ cluster_name }}"
   when: cluster_id is not defined
 
-- name: Get cluster registration tokens
+- name: Get K3S install command from Rancher
   uri:
     url: "{{ rancher_url }}/v3/clusterregistrationtokens?clusterId={{ cluster_id }}"
     method: GET
@@ -31,21 +31,21 @@
     status_code: 200
   register: token_response
 
-- name: Extract insecure node command
+- name: Extract K3S install command from Rancher response
   set_fact:
     insecure_node_command: "{{ token_response.json.data[0].insecureNodeCommand | default('', true) }}"
   when: token_response.json.data | length > 0
 
-- name: Fail if insecure node command not found
+- name: Check if K3S install command found
   fail:
     msg: "No valid insecure node command found"
   when: insecure_node_command == ''
 
-- name: Set command to register
+- name: Render K3S install command
   set_fact:
     registration_command: "{{ insecure_node_command }} --etcd --controlplane --worker"
 
-- name: Render and execute k3s install script
+- name: Render K3S install script. and install K3S
   shell: "{{ lookup('template', 'k3s_server_install.ssh.j2') }}"
 
 # - name: Display final connection URL contents
@@ -56,11 +56,11 @@
 #   debug:
 #     msg: "{{command_output.stdout}}"
 
-- name: Ensure rancher-system-agent.service is restarted
+- name: Restart Rancher
   systemd:
     name: rancher-system-agent.service
     state: restarted
 
-- name: Wait for Rancher to write necessary files
+- name: Wait for Rancher to restart and write out its configuration files
   pause:
     seconds: 45

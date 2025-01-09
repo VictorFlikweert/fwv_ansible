@@ -16,15 +16,15 @@
   apt:
     update_cache: yes
   
-- name: nvidia-container-toolkit is installed
+- name: Make sure the NVIDIA container toolkit is installed
   apt:
     name: "nvidia-container-toolkit"
     state: present
 
-- name: configure docker engine 1/2
+- name: Configure the Docker engine to use the NVIDIA runtime
   shell: sudo nvidia-ctk runtime configure --runtime=docker
 
-- name: configure docker engine 2/2
+- name: Configure the Docker engine to use the NVIDIA runtime by default
   ansible.builtin.copy:
     dest: /etc/docker/daemon.json
     content: |
@@ -42,7 +42,7 @@
     mode: '0644'
 
 
-- name: Restart Docker engine
+- name: Restart the Docker engine
   systemd:
     name: docker.service
     state: restarted
@@ -51,6 +51,6 @@
   pause:
     seconds: 10
 
-- name: Join worker node to k3s cluster
+- name: Join the jetson device to the PanelPC K3S cluster
   shell: |
     curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ cluster_version }} K3S_URL=https://{{ hostvars[groups['master'][0]]['ansible_host'] }}:6443 K3S_TOKEN={{ hostvars['pp1']['k3s_token'] }} sh -s - --docker --node-label machine-type=QG

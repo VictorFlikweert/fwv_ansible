@@ -1,7 +1,7 @@
-- name: Get k3s registration token
+- name: Get K3S registration token for new agents
   shell: sudo k3s token create
   register: k3s_token_output
 
-- name: Save k3s token
+- name: Save K3S token to be used by machines
   set_fact:
     k3s_token: "{{ k3s_token_output.stdout }}"

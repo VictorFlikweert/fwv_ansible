@@ -13,7 +13,7 @@
   set_fact:
     cluster_settings_content: "{{ lookup('template', 'cluster_settings.json.j2') }}"
 
-- name: Register cluster
+- name: Register cluster with Rancher
   uri:
     url: "{{ rancher_url }}/v1/provisioning.cattle.io.clusters"
     method: POST

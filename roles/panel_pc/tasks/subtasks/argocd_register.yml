@@ -1,11 +1,11 @@
-- name: Fetch k3s configuration file from the default remote machine to the local controller
+- name: Fetch K3S configuration file from the PanelPC
   fetch:
     src: /etc/rancher/k3s/k3s.yaml
     dest: /tmp/k3s.yaml
     flat: yes
   become: true  # Ensures permissions to access the file on the source machine
 
-- name: Copy the fetched k3s file from local to the destination host
+- name: Copy the K3S configuration file over to the main cluster
   copy:
     src: /tmp/k3s.yaml
     dest: "/tmp/k3s.yaml"
@@ -15,7 +15,7 @@
     ansible_user: fwv
     ansible_sudo_pass: "{{ main_cluster_pass }}"
 
-- name: Replace 127.0.0.1 in the file on the destination host
+- name: Replace 127.0.0.1 with the ip of the main cluster
   replace:
     path: "/tmp/k3s.yaml"
     regexp: "127\\.0\\.0\\.1"
@@ -26,7 +26,7 @@
     ansible_user: fwv
     ansible_sudo_pass: "{{ main_cluster_pass }}"
 
-- name: Move the modified file to the clusters directory on the destination host
+- name: Move the PanelPC kubeconfig file to the 'clusters' folder on the main cluster
   command: mv /tmp/k3s.yaml /srv/clusters/{{ cluster_name }}.yaml
   delegate_to: "{{ main_cluster_ip }}"
   become: true  # Ensures permissions to access the file on the source host
@@ -34,7 +34,7 @@
     ansible_user: fwv
     ansible_sudo_pass: "{{ main_cluster_pass }}"
 
-- name: Run the ArgoCD cluster add command on the destination host
+- name: Add the cluster to ArgoCD using the newly created file
   ansible.builtin.shell: |
     sudo argocd cluster add default --name {{ cluster_name }} --kubeconfig /srv/clusters/{{ cluster_name }}.yaml
   delegate_to: "{{ main_cluster_ip }}"
@@ -43,7 +43,7 @@
     ansible_user: fwv
     ansible_sudo_pass: "{{ main_cluster_pass }}"
 
-- name: Set default labels for argocd deployment
+- name: Set default labels for ArgoCD deployment
   ansible.builtin.shell: |
     sudo argocd cluster set {{ cluster_name }} --label env={{ kube_env }} --label group={{ kube_group }}
   delegate_to: "{{ main_cluster_ip }}"
