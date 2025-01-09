@@ -1,0 +1,26 @@
+- name: Render cluster_settings
+  template:
+    src: cluster_settings.json.j2
+    dest: /tmp/cluster_settings.json
+    mode: '0755'
+  vars:
+    cluster_name: "{{ hostvars['pp1']['cluster_name'] }}"
+
+- name: Read cluster_settings file
+  slurp:
+    src: /tmp/cluster_settings.json
+  register: cluster_settings_content
+
+- name: Register cluster
+  uri:
+    url: "{{ rancher_url }}/v1/provisioning.cattle.io.clusters"
+    method: POST
+    headers:
+      Authorization: "{{ auth_token }}"
+      Content-Type: "application/json"
+    body: "{{ cluster_settings_content.content | b64decode }}"
+    body_format: json
+    return_content: yes
+    validate_certs: no
+  failed_when: cluster_registration_response.status != 200 and cluster_registration_response.status != 201
+  register: cluster_registration_response

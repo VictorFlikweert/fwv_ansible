@@ -1,0 +1,18 @@
+- name: Test connectivity main cluster
+  ansible.builtin.command:
+    cmd: ping -c 2 172.16.10.106
+  register: ping_result
+  failed_when: ping_result.rc != 0
+
+- name: Editing the /etc/hosts file to make sure that we can reach the cluster through 'rancher.flikweertvision.nl'
+  lineinfile:
+    path: /etc/hosts
+    line: "172.16.10.106 rancher.flikweertvision.nl"
+    state: present
+  become: true
+
+- name: Set dynamic IP addresses
+  ansible.builtin.set_fact:
+    master_ip: "{{ ansible_default_ipv4.address }}"
+    internal_ip: "{{ ansible_default_ipv4.address }}"
+  when: ansible_default_ipv4 is defined
