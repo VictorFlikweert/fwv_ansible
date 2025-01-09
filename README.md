@@ -10,24 +10,24 @@ To run these playbooks, you must ensure that SSH access is set up for all nodes.
 ## Prerequisites
 Before running the playbooks, ensure the following prerequisites are met:
 
-#### Create an inventory file (e.g., `inventory/[ip].yml`) specifying the details of the machines in the cluster. (look at the files there for examples)
+1. Create an inventory file (e.g., `inventory/[ip].yml`) specifying the details of the machines in the cluster. (look at the files there for examples)
   
-#### Set up SSH authentication to the different machines, you can test if this has been done correctly by running the following command:
-```
-ansible all -m ping -i inventory/[machine_ip].yml
-```
+2. Set up SSH authentication to the different machines, you can test if this has been done correctly by running the following command:
+    ```
+    ansible all -m ping -i inventory/[machine_ip].yml
+    ```
 
-#### Set up secrets
-Configure sensitive information (e.g., passwords, tokens) in the `roles/panel_pc/vars/main.yml` file.
+3. Set up secrets:
+    Configure sensitive information (e.g., passwords, tokens) in the `roles/panel_pc/vars/main.yml` file.
 
-Example:
+    Example:
 
-```
-rancher_url: "***"
-auth_token: "***" (The Rancher API bearer token, can be regenerated through the Rancher UI)
-dockerhub_token: "***"
-main_cluster_pass: "***"
-```
+    ```
+    rancher_url: "***"
+    auth_token: "***" (The Rancher API bearer token, can be regenerated through the Rancher UI)
+    dockerhub_token: "***"
+    main_cluster_pass: "***"
+    ```
 
 
 ## How to Run
@@ -48,7 +48,6 @@ ansible-playbook -i inventory/[cluster_ip].yml playbooks/main.yml
 
 To completely uninstall K3S and Rancher from the cluster:
 ```
-
 ansible-playbook -i inventory/[cluster_ip].yml playbooks/reset.yml
 ```
 
