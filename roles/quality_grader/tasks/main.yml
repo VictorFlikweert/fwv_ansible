@@ -1,6 +1,7 @@
 - name: Editing the /etc/hosts file to make sure that we can reach the main cluster through 'rancher.flikweertvision.nl'
   lineinfile:
     path: /etc/hosts
+    regexp: '^\d+\.\d+\.\d+\.\d+\s+rancher\.flikweertvision\.nl$'
     line: "{{ main_cluster_ip }} rancher.flikweertvision.nl"
     state: present
   become: true

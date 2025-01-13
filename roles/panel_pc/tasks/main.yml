@@ -1,11 +1,11 @@
 - name: Configure the network to work with kubernetes
   import_tasks: subtasks/network_setup.yml
 
-- name: Register the cluster with Rancher
-  import_tasks: subtasks/rancher_register.yml
+# - name: Register the cluster with Rancher
+#   import_tasks: subtasks/rancher_register.yml
 
-- name: Install K3S using the script provided by Rancher
-  import_tasks: subtasks/rancher_k3s_install.yml
+# - name: Install K3S using the script provided by Rancher
+#   import_tasks: subtasks/rancher_k3s_install.yml
 
 - name: K3S configuration (NVidia runtime, dockerhub registration)
   import_tasks: subtasks/k3s_configuration.yml
