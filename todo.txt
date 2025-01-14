@@ -1,0 +1,2 @@
+- Argocd connectivity check (Proper routes setup on cluster)
+- Argocd "token is expired" -> relogin? 
