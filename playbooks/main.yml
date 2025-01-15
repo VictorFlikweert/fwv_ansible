@@ -1,4 +1,21 @@
----
+- name: Check system health on master node
+  hosts: master
+  become: yes
+  tasks:
+    - name: PPC health check
+      import_role: 
+        name: panel_pc
+        tasks_from: health_check
+
+- name: Check system health on worker nodes
+  hosts: workers
+  become: yes
+  tasks:
+    - name: PPC health check
+      import_role: 
+        name: quality_grader
+        tasks_from: health_check
+
 - name: Setup master node
   hosts: master
   gather_facts: true

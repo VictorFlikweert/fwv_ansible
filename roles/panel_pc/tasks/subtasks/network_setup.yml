@@ -1,9 +1,3 @@
-- name: Test if the PPC can reach the main cluster
-  ansible.builtin.command:
-    cmd: "ping -c 2 {{ main_cluster_ip }}"
-  register: ping_result
-  failed_when: ping_result.rc != 0
-
 - name: Editing the /etc/hosts file to make sure that we can reach the main cluster through 'rancher.flikweertvision.nl'
   lineinfile:
     path: /etc/hosts

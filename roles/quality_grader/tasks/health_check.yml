@@ -1,0 +1,16 @@
+- name: Check available disk space on root partition
+  ansible.builtin.command: df -h /
+  register: disk_space
+
+- name: Ensure at least 5GB of disk space is available
+  ansible.builtin.assert:
+    that:
+      - disk_space.stdout | regex_search('\d+(?=G)') | int >= 5
+    fail_msg: "Less than 5GB of disk space is available on the root partition."
+    success_msg: "Sufficient disk space is available on the root partition."
+
+- name: Test if the QG can reach the PPC
+  ansible.builtin.command:
+    cmd: "ping -c 2 {{ hostvars[groups['master'][0]]['ansible_host'] }}"
+  register: ping_result
+  failed_when: ping_result.rc != 0

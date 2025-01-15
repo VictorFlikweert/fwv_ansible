@@ -1,3 +1,4 @@
 - Test connectivity to cluster
 - Argocd connectivity check (Proper routes setup on cluster)
-- Argocd "token is expired" -> relogin? 
+- Argocd "token is expired" -> relogin? \
+- Memory check on all nodes
