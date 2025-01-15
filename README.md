@@ -1,7 +1,7 @@
 # Ansible Playbooks Documentation
 This Ansible project provides a collection of playbooks to streamline the provisioning of new QualityGrader kubernetes clusters consisting of a PanelPC and one or more Jetsons as part of the Quality Grader setup. The playbooks include tasks for:
 
-- Installing k3s and registering the ppc cluster with Rancher/ArgoCD. (`main.yml`)
+- Installing k3s and registering the ppc cluster with ArgoCD. (`main.yml`)
 
 - Uninstalling all Kubernetes-related components from all of the nodes. (`reset.yml`)
 
@@ -24,7 +24,6 @@ Before running the playbooks, ensure the following prerequisites are met:
 
     ```
     rancher_url: "***"
-    auth_token: "***" (The Rancher API bearer token, can be regenerated through the Rancher UI)
     dockerhub_token: "***"
     main_cluster_pass: "***"
     ```
@@ -56,21 +55,14 @@ ansible-playbook -i inventory/[cluster_ip].yml playbooks/reset.yml
 
 To reset a cluster properly before reinitializing, follow these steps carefully:
 
-1. Delete the Cluster via Rancher UI
-   - Log in to the Rancher UI.
-   - Navigate to the Clusters section.
-   - Select the cluster you want to reset.
-   - Click Delete and confirm the action.
-   - Wait for the deletion process to complete before proceeding.
-
-2.  Delete the Cluster via ArgoCD UI
+1.  Delete the Cluster via ArgoCD UI
     - Log in to the ArgoCD UI.
     - Navigate to the Clusters section.
     - Select the cluster you want to reset.
     - Click Delete and confirm the action.
     - Refresh to confirm the cluster has been removed.
 
-3. Run the reset.yml Script
+2. Run the reset.yml Script
    - To completely uninstall K3S and Rancher from the cluster:
     ```
     ansible-playbook -i inventory/[cluster_ip].yml playbooks/reset.yml

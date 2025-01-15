@@ -1,4 +1,8 @@
 ---
+- name: Verify connection to main cluster
+  delegate_to: "{{ main_cluster_ip }}"
+  shell: echo "Hello world!"
+
 - name: Setup master node
   hosts: master
   gather_facts: true
