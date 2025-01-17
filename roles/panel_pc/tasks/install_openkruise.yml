@@ -1,0 +1,34 @@
+- name: Download Helm install script
+  get_url:
+    url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    dest: /tmp/get_helm.sh
+    mode: '0700'
+
+- name: Install Helm
+  shell: /tmp/get_helm.sh
+  args:
+    creates: /usr/local/bin/helm
+
+- name: Add OpenKruise Helm repository
+  shell: helm repo add openkruise https://openkruise.github.io/charts
+  args:
+    creates: ~/.cache/helm/repository/openkruise-index.yaml
+
+- name: Update Helm repositories
+  shell: helm repo update
+
+- name: Install Kruise with ImagePullJobGate and PreDownloadImageForDaemonSetUpdate enabled
+  shell: |
+    helm install kruise openkruise/kruise \
+      --version 1.7.1 \
+      --set featureGates="ImagePullJobGate=true,PreDownloadImageForDaemonSetUpdate=true" \
+      --kubeconfig=/etc/rancher/k3s/k3s.yaml
+  args:
+    creates: /etc/rancher/k3s/kruise-installed
+  register: kruise_install
+
+- name: Create marker file after Kruise installation
+  file:
+    path: /etc/rancher/k3s/kruise-installed
+    state: touch
+  when: kruise_install.changed

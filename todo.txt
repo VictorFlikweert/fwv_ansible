@@ -1,4 +1,3 @@
-- Test connectivity to cluster
 - Argocd connectivity check (Proper routes setup on cluster)
-- Argocd "token is expired" -> relogin? \
-- Memory check on all nodes
+- Argocd "token is expired" -> relogin?  argo list all 
+- Ping cluster -> PPC test
