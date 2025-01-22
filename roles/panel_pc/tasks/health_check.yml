@@ -5,9 +5,7 @@
   delegate_to: "{{ main_cluster_ip }}"
   become: true
   register: argocd_app_list
-  failed_when: >
-    (argocd_app_list.rc != 0 and 
-    'rpc error: code = Unauthenticated desc = invalid session: Token is expired' not in argocd_app_list.stderr)
+  failed_when: argocd_app_list.rc != 0
   vars:
     ansible_user: fwv
     ansible_sudo_pass: "{{ main_cluster_pass }}"
