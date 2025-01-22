@@ -22,20 +22,11 @@
 #     ansible_user: fwv
 #     ansible_sudo_pass: "{{ main_cluster_pass }}"
 
-- name: Ping master node from the cluster
-  shell: |
-    ping -c 4 "{{ master_node_ip }}"
+- name: Test if the cluster can reach the PPC
+  ansible.builtin.command:
+    cmd: "ping -c 2 {{ hostvars[groups['master'][0]]['ansible_host']}}"
   register: ping_result
   failed_when: ping_result.rc != 0
-  vars:
-    master_node_ip: "{{ groups['master_nodes'][0] }}"
-  delegate_to: "{{ main_cluster_ip }}"
-  become: true
-
-- name: Check ping result
-  debug:
-    msg: "Ping to the master node was successful"
-  when: ping_result.rc == 0
 
 - name: Ensure rancher_url is set
   ansible.builtin.assert:
