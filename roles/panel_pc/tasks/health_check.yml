@@ -1,3 +1,42 @@
+
+- name: List ArgoCD applications
+  shell: |
+    sudo argocd app list
+  delegate_to: "{{ main_cluster_ip }}"
+  become: true
+  register: argocd_app_list
+  failed_when: >
+    (argocd_app_list.rc != 0 and 
+    'rpc error: code = Unauthenticated desc = invalid session: Token is expired' not in argocd_app_list.stderr)
+  vars:
+    ansible_user: fwv
+    ansible_sudo_pass: "{{ main_cluster_pass }}"
+
+# - name: Refresh ArgoCD token if expired
+#   shell: |
+#     sudo argocd login --username admin --password "{{ argocd_admin_password }}" --insecure
+#   delegate_to: "{{ main_cluster_ip }}"
+#   become: true
+#   when: "'rpc error: code = Unauthenticated desc = invalid session: Token is expired' in argocd_app_list.stderr"
+#   vars:
+#     ansible_user: fwv
+#     ansible_sudo_pass: "{{ main_cluster_pass }}"
+
+- name: Ping master node from the cluster
+  shell: |
+    ping -c 4 "{{ master_node_ip }}"
+  register: ping_result
+  failed_when: ping_result.rc != 0
+  vars:
+    master_node_ip: "{{ groups['master_nodes'][0] }}"
+  delegate_to: "{{ main_cluster_ip }}"
+  become: true
+
+- name: Check ping result
+  debug:
+    msg: "Ping to the master node was successful"
+  when: ping_result.rc == 0
+
 - name: Ensure rancher_url is set
   ansible.builtin.assert:
     that:
