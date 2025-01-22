@@ -39,9 +39,9 @@ ansible all -m ping -i inventory/[cluster_ip].yml
 
 
 To provision a new cluster:
-
 ```
 ansible-playbook -i inventory/[cluster_ip].yml playbooks/main.yml
+ansible-playbook -i inventory/[cluster_ip].yml playbooks/openkruise.yml
 ```
 
 
