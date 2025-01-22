@@ -1,4 +1,3 @@
-
 - name: List ArgoCD applications
   shell: |
     sudo argocd app list
@@ -9,6 +8,12 @@
   vars:
     ansible_user: fwv
     ansible_sudo_pass: "{{ main_cluster_pass }}"
+  ignore_errors: true
+
+- name: Fail if listing ArgoCD applications failed
+  fail:
+    msg: "{{main_cluster_ip}} has to relogin to ArgoCD, please do so by hand: 'sudo argocd login localhost:30503'"
+  when: argocd_app_list.rc != 0
 
 # - name: Refresh ArgoCD token if expired
 #   shell: |
