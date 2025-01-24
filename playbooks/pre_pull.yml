@@ -17,11 +17,8 @@
 - name: Check system health on worker nodes
   hosts: workers
   become: yes
-  tasks:
-    - name: PC health check
-      import_role: 
-        name: quality_grader
-        tasks_from: health_check
+  roles:
+    - quality_grader/health_check
   vars_files:
     - vars/main.yml
 
@@ -29,11 +26,8 @@
 - name: Pull image on main worker node
   hosts: workers
   gather_facts: true
-  tasks:
-    - name: Pull Docker images
-      import_role: 
-        name: quality_grader
-        tasks_from: pre_pull
+  roles:
+    - quality_grader/pre_pull
   vars_files:
     - vars/main.yml
     - vars/pre_pull.yml

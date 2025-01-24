@@ -17,11 +17,8 @@
 - name: Check system health on worker nodes
   hosts: workers
   become: yes
-  tasks:
-    - name: PC health check
-      import_role: 
-        name: quality_grader
-        tasks_from: health_check
+  roles:
+    - quality_grader/health_check
   vars_files:
     - vars/main.yml
 
@@ -37,6 +34,6 @@
   hosts: workers
   gather_facts: true
   roles:
-    - quality_grader
+    - quality_grader/kubernetes_setup
   vars_files:
     - vars/main.yml

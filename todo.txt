@@ -1,16 +1,6 @@
 Requirements:
 - Bulk running of playbooks (multiple inventories)
 - Better inventory management
-- Separate configuration per playbook
-X Put secrets in one place
 - Document
 
-
-
-X Unify the secrets into one place 
 - Look at inventory setup
-/ Organize tasks into folders
-X Split up healthchecks ( ArgoCD / disk_space )
-- Comment the tasks
-- Separate variables/inventories per play (?)
-X Stop all docker containers on hosts in reset script
