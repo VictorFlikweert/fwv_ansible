@@ -1,11 +1,15 @@
+- name: Check if all variables have been set
+  hosts: localhost
+  gather_facts: true
+  roles:
+    - pre_check
+  vars_files:
+    - vars/main.yml
+
 - name: Check system health on master node
   hosts: master
   become: yes
   tasks:
-    - name: PPC health check
-      import_role: 
-        name: ppc_health_check
-        tasks_from: variables
     - name: PPC connectivity check
       import_role: 
         name: ppc_health_check
