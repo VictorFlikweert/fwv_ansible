@@ -13,10 +13,6 @@ all:
             qg2:
               ansible_host: 10.23.46.12
       vars:
-        main_cluster_ip: 172.16.10.105
         cluster_name: amsing
-        cluster_version: v1.30.6+k3s1
-        kube_env: dev
-        kube_group: production
   vars:
     ansible_user: root

@@ -13,10 +13,6 @@ all:
             qg2:
               ansible_host: 10.23.121.12
       vars:
-        main_cluster_ip: 172.16.10.106
         cluster_name: flikweertintern121
-        cluster_version: v1.30.6+k3s1
-        kube_env: test
-        kube_group: test-group
   vars:
     ansible_user: root
