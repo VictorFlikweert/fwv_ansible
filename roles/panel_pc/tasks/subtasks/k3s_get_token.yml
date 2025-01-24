@@ -1,3 +1,4 @@
+# Retrieves the k3s registration token
 - name: Get K3S registration token for new agents
   shell: sudo k3s token create
   register: k3s_token_output

@@ -1,3 +1,6 @@
+# These tasks run on the PanelPC and the cluster both. 
+# The kubeconfig is copied over from the panel pc,
+# then runs the commands on the main cluster to add the cluster to ArgoCD.
 - name: Fetch K3S configuration file from the PanelPC
   fetch:
     src: /etc/rancher/k3s/k3s.yaml

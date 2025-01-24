@@ -5,7 +5,19 @@
     - name: PPC health check
       import_role: 
         name: panel_pc
-        tasks_from: health_check
+        tasks_from: health_checks/variables
+    - name: PPC connectivity check
+      import_role: 
+        name: panel_pc
+        tasks_from: health_checks/connectivity
+    - name: PPC disk space check
+      import_role: 
+        name: panel_pc
+        tasks_from: health_checks/disk_space
+    - name: PPC argocd check
+      import_role: 
+        name: panel_pc
+        tasks_from: health_checks/argocd_check
 
 - name: Check system health on worker nodes
   hosts: workers

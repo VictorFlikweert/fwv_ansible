@@ -1,3 +1,4 @@
+# Some small network configuration
 - name: Editing the /etc/hosts file to make sure that we can reach the main cluster through 'rancher.flikweertvision.nl'
   lineinfile:
     path: /etc/hosts

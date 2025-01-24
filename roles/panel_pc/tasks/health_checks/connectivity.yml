@@ -1,0 +1,36 @@
+- name: Test if the cluster can reach the PPC
+  ansible.builtin.command:
+    cmd: "ping -c 2 {{ hostvars[groups['master'][0]]['ansible_host']}}"
+  register: ping_result
+  failed_when: ping_result.rc != 0
+
+- name: Test if the PPC can reach the main cluster
+  ansible.builtin.command:
+    cmd: "ping -c 2 {{ main_cluster_ip }}"
+  register: ping_result
+  failed_when: ping_result.rc != 0
+  
+- name: Ensure rancher_url is set
+  ansible.builtin.assert:
+    that:
+      - rancher_url is defined
+      - rancher_url | length > 0
+    fail_msg: "The variable 'rancher_url' is not set. (Check ./roles/panel_pc/vars/main.yml)"
+    success_msg: "The variable 'rancher_url' is set."
+
+- name: Ensure dockerhub_token is set
+  ansible.builtin.assert:
+    that:
+      - dockerhub_token is defined
+      - dockerhub_token | length > 0
+    fail_msg: "The variable 'dockerhub_token' is not set. (Check ./roles/panel_pc/vars/main.yml)"
+    success_msg: "The variable 'dockerhub_token' is set."
+
+- name: Ensure main_cluster_pass is set
+  ansible.builtin.assert:
+    that:
+      - main_cluster_pass is defined
+      - main_cluster_pass | length > 0
+    fail_msg: "The variable 'main_cluster_pass' is not set. (Check ./roles/panel_pc/vars/main.yml)"
+    success_msg: "The variable 'main_cluster_pass' is set."
+
