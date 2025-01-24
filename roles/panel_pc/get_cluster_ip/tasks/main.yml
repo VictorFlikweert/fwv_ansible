@@ -1,0 +1,31 @@
+- name: Test connectivity to cluster_ip_ixon
+  ansible.builtin.command:
+    cmd: "ping -c 2 {{ cluster_ip_ixon }}"
+  register: ping_ixon_result
+  failed_when: false
+
+- name: Test connectivity to cluster_ip_netw
+  ansible.builtin.command:
+    cmd: "ping -c 2 {{ cluster_ip_netw }}"
+  register: ping_netw_result
+  failed_when: false
+  when: ping_ixon_result.rc != 0
+
+- name: Set main_cluster_ip to cluster_ip_ixon if reachable
+  ansible.builtin.set_fact:
+    main_cluster_ip: "{{ cluster_ip_ixon }}"
+  when: ping_ixon_result.rc == 0
+
+- name: Set main_cluster_ip to cluster_ip_netw if ixon is unreachable and netw is reachable
+  ansible.builtin.set_fact:
+    main_cluster_ip: "{{ cluster_ip_netw }}"
+  when: ping_ixon_result.rc != 0 and ping_netw_result.rc == 0
+
+- name: Fail if neither IP is reachable
+  ansible.builtin.fail:
+    msg: "Both cluster_ip_ixon and cluster_ip_netw are unreachable. Cannot continue."
+  when: ping_ixon_result.rc != 0 and ping_netw_result.rc != 0
+
+- name: Debug the selected main_cluster_ip
+  ansible.builtin.debug:
+    msg: "The selected main_cluster_ip is {{ main_cluster_ip }}"

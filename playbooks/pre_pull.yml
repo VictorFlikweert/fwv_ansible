@@ -6,6 +6,14 @@
   vars_files:
     - vars/main.yml
 
+- name: Get cluster ip from PPC
+  hosts: master
+  become: yes
+  roles:
+    - panel_pc/get_cluster_ip
+  vars_files:
+    - vars/main.yml
+
 - name: Check system health on PPC
   hosts: master
   become: yes
