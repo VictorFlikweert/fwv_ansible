@@ -4,20 +4,22 @@
   tasks:
     - name: PPC health check
       import_role: 
-        name: panel_pc
-        tasks_from: health_checks/variables
+        name: ppc_health_check
+        tasks_from: variables
     - name: PPC connectivity check
       import_role: 
-        name: panel_pc
-        tasks_from: health_checks/connectivity
+        name: ppc_health_check
+        tasks_from: connectivity
     - name: PPC disk space check
       import_role: 
-        name: panel_pc
-        tasks_from: health_checks/disk_space
+        name: ppc_health_check
+        tasks_from: disk_space
     - name: PPC argocd check
       import_role: 
-        name: panel_pc
-        tasks_from: health_checks/argocd_check
+        name: ppc_health_check
+        tasks_from: argocd_check
+  vars_files:
+    - vars/main.yml
 
 - name: Check system health on worker nodes
   hosts: workers
@@ -27,18 +29,24 @@
       import_role: 
         name: quality_grader
         tasks_from: health_check
+  vars_files:
+    - vars/main.yml
 
 - name: Setup master node
   hosts: master
   gather_facts: true
   roles:
     - panel_pc
+  vars_files:
+    - vars/main.yml
 
 - name: Configure worker nodes with NVIDIA runtime and join cluster
   hosts: workers
   gather_facts: true
   roles:
     - quality_grader
+  vars_files:
+    - vars/main.yml
 
 - name: Install openkruise to the panelpc
   hosts: master
@@ -48,3 +56,5 @@
       import_role: 
         name: panel_pc
         tasks_from: install_openkruise
+  vars_files:
+    - vars/main.yml
