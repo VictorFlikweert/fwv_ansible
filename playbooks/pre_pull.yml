@@ -36,14 +36,13 @@
         tasks_from: pre_pull
   vars_files:
     - vars/main.yml
+    - vars/pre_pull.yml
 
 - name: Pull images on main worker node
   hosts: master
   gather_facts: true
-  tasks:
-    - name: Pull Docker images
-      import_role: 
-        name: panel_pc
-        tasks_from: pre_pull
+  roles:
+    - panel_pc/pre_pull
   vars_files:
     - vars/main.yml
+    - vars/pre_pull.yml

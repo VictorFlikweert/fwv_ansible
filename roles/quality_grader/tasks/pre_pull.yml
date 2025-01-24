@@ -4,12 +4,12 @@
   when: ansible_host == hostvars[groups['workers'][0]]['ansible_host']
 
 - name: Pull Docker image
-  command: sudo docker pull flikweertvision/quality_grader:1.7.0-pc_docker-orin
+  command: sudo docker pull flikweertvision/quality_grader:{{ qg_tag }}
   become: true
   when: ansible_host == hostvars[groups['workers'][0]]['ansible_host']
 
 - name: Save Docker image
-  command: sudo docker save -o /tmp/quality_grader.tar flikweertvision/quality_grader:1.7.0-pc_docker-orin
+  command: sudo docker save -o /tmp/quality_grader.tar flikweertvision/quality_grader:{{ qg_tag }}
   become: true
   when: ansible_host == hostvars[groups['workers'][0]]['ansible_host']
 

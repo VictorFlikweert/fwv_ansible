@@ -1,0 +1,7 @@
+- name: Pull first image
+  command: sudo crictl pull --creds larsflikweert:{{ dockerhub_token }} flikweertvision/panelpc-gui:{{ ppc_gui_tag }}
+  become: true
+  
+- name: Pull second image
+  command: sudo crictl pull --creds larsflikweert:{{ dockerhub_token }} flikweertvision/panelpc-api:{{ ppc_api_tag }}
+  become: true

@@ -29,7 +29,7 @@
   hosts: master
   gather_facts: true
   roles:
-    - panel_pc
+    - panel_pc/kubernetes_setup
   vars_files:
     - vars/main.yml
 
