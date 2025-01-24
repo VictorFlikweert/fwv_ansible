@@ -9,3 +9,6 @@
 
 - name: Save the K3S token for the registration of subnodes
   import_tasks: subtasks/k3s_get_token.yml
+
+- name: Save the K3S token for the registration of subnodes
+  import_tasks: subtasks/install_openkruise.yml

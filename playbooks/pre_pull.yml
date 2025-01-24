@@ -6,18 +6,11 @@
   vars_files:
     - vars/main.yml
 
-- name: Check system health on master node
+- name: Check system health on PPC
   hosts: master
   become: yes
-  tasks:
-    - name: PPC connectivity check
-      import_role: 
-        name: ppc_health_check
-        tasks_from: connectivity
-    - name: PPC disk space check
-      import_role: 
-        name: ppc_health_check
-        tasks_from: disk_space
+  roles:
+    - panel_pc/health_check
   vars_files:
     - vars/main.yml
 

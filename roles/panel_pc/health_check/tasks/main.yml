@@ -1,0 +1,9 @@
+- name: Check if ArgoCD is working
+  import_tasks: argocd_check.yml
+
+- name: Check if everything can reach everything else
+  import_tasks: connectivity.yml
+
+- name: Check if the panel_pc has enough disk space
+  import_tasks: disk_space.yml
+

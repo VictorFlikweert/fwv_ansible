@@ -6,22 +6,11 @@
   vars_files:
     - vars/main.yml
 
-- name: Check system health on master node
+- name: Check system health on PPC
   hosts: master
   become: yes
-  tasks:
-    - name: PPC connectivity check
-      import_role: 
-        name: ppc_health_check
-        tasks_from: connectivity
-    - name: PPC disk space check
-      import_role: 
-        name: ppc_health_check
-        tasks_from: disk_space
-    - name: PPC argocd check
-      import_role: 
-        name: ppc_health_check
-        tasks_from: argocd_check
+  roles:
+    - panel_pc/health_check
   vars_files:
     - vars/main.yml
 
@@ -49,16 +38,5 @@
   gather_facts: true
   roles:
     - quality_grader
-  vars_files:
-    - vars/main.yml
-
-- name: Install openkruise to the panelpc
-  hosts: master
-  become: yes
-  tasks:
-    - name: Install openkruise to the machine
-      import_role: 
-        name: panel_pc
-        tasks_from: install_openkruise
   vars_files:
     - vars/main.yml

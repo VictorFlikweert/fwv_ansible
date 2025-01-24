@@ -12,5 +12,5 @@
 
 - name: Fail if listing ArgoCD applications failed
   fail:
-    msg: "{{main_cluster_ip}} has to relogin to ArgoCD, please do so by hand: 'sudo argocd login localhost:30503'"
+    msg: "{{main_cluster_ip}} has to relogin to ArgoCD, please do so by hand, ssh into the machine and run: 'sudo argocd login localhost:[port]'"
   when: argocd_app_list.rc != 0
