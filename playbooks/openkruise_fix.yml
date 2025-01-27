@@ -2,14 +2,6 @@
   hosts: master
   become: true
   tasks:
-    # - name: Uninstall openkruise since we want to upgrade it, but apparently upgrading doesn't work directly
-    #   shell: |
-    #     sudo helm --kubeconfig=/etc/rancher/k3s/k3s.yaml uninstall kruise
-
-    # - name: Wait for openkruise to be uninstalled
-    #   pause:
-    #     seconds: 10
-
     - name: Update the openkruise deployment to specify the runtime socket path
       shell: |
         sudo helm --kubeconfig=/etc/rancher/k3s/k3s.yaml upgrade kruise openkruise/kruise --version 1.7.1 --set featureGates="ImagePullJobGate=true\,PreDownloadImageForDaemonSetUpdate=true\,TemplateNoDefaults=true" --set daemon.socketLocation=/var/run/k3s
