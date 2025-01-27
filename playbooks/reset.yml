@@ -40,12 +40,17 @@
       shell: /usr/local/bin/rancher-system-agent-uninstall.sh
       when: rancher_exists.stat.exists
 
-    # - name: Stop all containers
-    #   shell: docker stop $(docker ps -a -q)
-    #   ignore_errors: yes
-    #   when: ansible_hostname != "master"
+    - name: Get the list of all containers
+      command: docker ps -a -q
+      register: container_list
+      changed_when: false
 
-    # - name: Remove all containers
-    #   shell: docker rm $(docker ps -a -q)
-    #   ignore_errors: yes
-    #   when: ansible_hostname != "master"
+    - name: Stop all containers
+      shell: echo "{{ container_list.stdout }}" | xargs -r docker stop
+      when: container_list.stdout != ""
+      ignore_errors: yes
+
+    - name: Remove all containers
+      shell: echo "{{ container_list.stdout }}" | xargs -r docker rm
+      when: container_list.stdout != ""
+      ignore_errors: yes

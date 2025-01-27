@@ -1,0 +1,16 @@
+all:
+  children:
+    cluster1:
+      children:
+        master:
+          hosts:
+            pp1:
+              ansible_host: 10.23.38.50
+        workers:
+          hosts:
+            qg1:
+              ansible_host: 10.23.38.11
+      vars:
+        cluster_name: vandetorren
+  vars:
+    ansible_user: root

@@ -5,6 +5,7 @@
     - pre_check
   vars_files:
     - vars/main.yml
+    - vars/provision.yml
 
 - name: Get cluster ip from PPC
   hosts: master
@@ -13,6 +14,7 @@
     - panel_pc/get_cluster_ip
   vars_files:
     - vars/main.yml
+    - vars/provision.yml
 
 - name: Check system health on PPC
   hosts: master
@@ -21,6 +23,7 @@
     - panel_pc/health_check
   vars_files:
     - vars/main.yml
+    - vars/provision.yml
 
 - name: Check system health on worker nodes
   hosts: workers
@@ -29,22 +32,22 @@
     - quality_grader/health_check
   vars_files:
     - vars/main.yml
+    - vars/provision.yml
 
-
-- name: Pull image on main worker node
-  hosts: workers
-  gather_facts: true
-  roles:
-    - quality_grader/pre_pull
-  vars_files:
-    - vars/main.yml
-    - vars/pre_pull.yml
-
-- name: Pull images on main worker node
+- name: Setup master node
   hosts: master
   gather_facts: true
   roles:
-    - panel_pc/pre_pull
+    - panel_pc/kubernetes_setup
   vars_files:
     - vars/main.yml
-    - vars/pre_pull.yml
+    - vars/provision.yml
+
+- name: Configure worker nodes with NVIDIA runtime and join cluster
+  hosts: workers
+  gather_facts: true
+  roles:
+    - quality_grader/kubernetes_setup
+  vars_files:
+    - vars/main.yml
+    - vars/provision.yml

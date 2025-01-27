@@ -1,0 +1,6 @@
+Requirements:
+- Bulk running of playbooks (multiple inventories)
+- Better inventory management
+- Document
+
+- Look at inventory setup

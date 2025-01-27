@@ -1,0 +1,6 @@
+rancher_url: 
+dockerhub_token: 
+main_cluster_pass: 
+machine_pass: 
+cluster_ip_netw: "172.16.10.106"
+cluster_ip_ixon: "10.187.50.3"

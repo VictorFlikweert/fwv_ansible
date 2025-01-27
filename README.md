@@ -18,7 +18,7 @@ Before running the playbooks, ensure the following prerequisites are met:
     ```
 
 3. Set up secrets:
-    Configure sensitive information (e.g., passwords, tokens) in the `roles/panel_pc/vars/main.yml` file.
+    Configure sensitive information (e.g., passwords, tokens) in the `playbooks/vars/main.yml` file.
 
     Example:
 
@@ -26,6 +26,7 @@ Before running the playbooks, ensure the following prerequisites are met:
     rancher_url: "***"
     dockerhub_token: "***"
     main_cluster_pass: "***"
+    machine_pass: "***"
     ```
 
 
@@ -41,7 +42,6 @@ ansible all -m ping -i inventory/[cluster_ip].yml
 To provision a new cluster:
 ```
 ansible-playbook -i inventory/[cluster_ip].yml playbooks/main.yml
-ansible-playbook -i inventory/[cluster_ip].yml playbooks/openkruise.yml
 ```
 
 
