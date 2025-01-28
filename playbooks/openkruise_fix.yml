@@ -1,3 +1,36 @@
+- name: Check if all variables have been set
+  hosts: localhost
+  gather_facts: true
+  roles:
+    - pre_check
+  vars_files:
+    - vars/main.yml
+
+- name: Get cluster ip from PPC
+  hosts: master
+  become: yes
+  roles:
+    - panel_pc/get_cluster_ip
+  vars_files:
+    - vars/main.yml
+    - vars/provision.yml
+
+- name: Check system health on PPC
+  hosts: master
+  become: yes
+  roles:
+    - panel_pc/health_check
+  vars_files:
+    - vars/main.yml
+
+- name: Check system health on worker nodes
+  hosts: workers
+  become: yes
+  roles:
+    - quality_grader/health_check
+  vars_files:
+    - vars/main.yml
+
 - name: Update openkruise deployment
   hosts: master
   become: true
@@ -10,6 +43,12 @@
   hosts: workers
   become: true
   tasks: 
+    - name: Add a line to the k3s service file
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/system/k3s-agent.service
+        line: "ExecStartPost=/bin/sh -c 'cd /var/run/k3s && ln -s ./cri-dockerd/cri-dockerd.sock ./cri-dockerd.sock'"
+        insertbefore: "^ExecStart="  # Ensures it is added before the first ExecStart
+        state: present
     - name: Symlink the cri-dockerd.sock file to the folder above
       shell: |
         cd /var/run/k3s && ln -s ./cri-dockerd/cri-dockerd.sock ./cri-dockerd.sock
