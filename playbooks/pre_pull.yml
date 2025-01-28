@@ -21,6 +21,7 @@
     - panel_pc/health_check
   vars_files:
     - vars/main.yml
+    - vars/provision.yml
 
 - name: Check system health on worker nodes
   hosts: workers
