@@ -43,6 +43,12 @@
   hosts: workers
   become: true
   tasks: 
+    - name: Add a line to the k3s service file
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/system/k3s-agent.service
+        line: "ExecStartPost=/bin/sh -c 'cd /var/run/k3s && ln -s ./cri-dockerd/cri-dockerd.sock ./cri-dockerd.sock'"
+        insertbefore: "^ExecStart="  # Ensures it is added before the first ExecStart
+        state: present
     - name: Symlink the cri-dockerd.sock file to the folder above
       shell: |
         cd /var/run/k3s && ln -s ./cri-dockerd/cri-dockerd.sock ./cri-dockerd.sock
